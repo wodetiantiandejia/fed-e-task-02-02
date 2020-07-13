@@ -1,0 +1,38 @@
+1、Webpack 的构建流程主要有哪些环节？如果可以请尽可能详尽的描述 Webpack 打包的整个过程。
+Webpack构建运行在node.js环境下，它的配置文件遵循CommonJS规范，webpack.config.js导出一个Object对象（或者导出一个Function，或者导出一个Promise函数，还可以导出一个数组包含多份配置）。Webpack从入口文件开始，识别出源码中的模块化导入语句，递归地找出所有依赖，然后把入口文件和所有依赖打包到一个单独的文件中(即一个chunk)，这就是所谓的模块打包。最新版的Webpack，已经支持了E6/CommonJS/AMD等模块化语句。
+什么是loader？
+Loader用于对模块文件进行编译转换和加载处理，在module.rules数组中进行配置，它用于告诉Webpack在遇到哪些文件时使用哪些Loader去加载和转换。Loader还可以通过querystring或object指定选项参数。
+什么是plugin?
+Plugin用于扩展Webpack功能，实现原理是在构建流程里注入钩子函数。在plugins数组中进行配置。
+关于DevServer：
+DevServer用于提供HTTP服务、监听文件变化并实时刷新页面、支持SourceMap以方便调试。
+六个核心概念：
+Entry，入口，这是Webpack执行构建的第一步，可理解为输入。
+Module，模块，在Webpack中一切皆模块，一个模块即为一个文件。Webpack会从Entry开始递归找出所有的依赖模块。
+Chunk，代码块，一个Chunk由多个模块组合而成，它用于代码合并与分割。
+Loader，模块转换器，用于将模块的原内容按照需求转换成新内容。
+Plugin，扩展插件，在Webpack构建过程的特定时机注入扩展逻辑，用来改变或优化构建结果。
+Output，输出结果，源码在Webpack中经过一系列处理后而得出的最终结果。
+Webpack构建流程：
+Webpack在启动后，会从Entry开始，递归解析Entry依赖的所有Module，每找到一个Module，就会根据Module.rules里配置的Loader规则进行相应的转换处理，对Module进行转换后，再解析出当前Module依赖的Module，这些Module会以Entry为单位进行分组，即为一个Chunk。因此一个Chunk，就是一个Entry及其所有依赖的Module合并的结果。最后Webpack会将所有的Chunk转换成文件输出Output。在整个构建流程中，Webpack会在恰当的时机执行Plugin里定义的逻辑，从而完成Plugin插件的优化任务。
+entry，指定了模块的入口，它让源文件加入构建流程中被webpack控制。
+output，配置如何输出最终的代码结果。
+module，配置各种类型的模块的处理规则和解析策略。
+rosolve，配置webpack寻找模块的规则。
+plugin，配置扩展插件，扩展webpack的更多功能。
+devServer，配置DevServer，实现本地http服务、模块热替换、source map调试等。
+
+2、Loader 和 Plugin 有哪些不同？请描述一下开发 Loader 和 Plugin 的思路。
+Loader:加载器
+loader是文件加载器,运行在NodeJS中，能够加载资源文件，并对这些文件进行一些处理，诸如编译、压缩等，最终一起打包到指定的文件中,将A文件进行编译形成B文件，这里操作的是文件，比如将A.scss或A.less转变为B.css，单纯的文件转换过程；
+如：css-loader和style-loader模块是为了打包css的babel-loader和babel-core模块时为了把ES6的代码转成ES5url-loader和file-loader是把图片进行打包的。
+plugin:插件
+在webpack运行的生命周期中会广播出许多事件，plugin可以监听这些事件，在合适的时机通过webpack提供的API改变输出结果。插件的范围包括，从打包优化和压缩，一直到重新定义环境中的变量。插件接口功能极其强大，可以用来处理各种各样的任务。
+
+webpack功能强大，难点在于它的配置文件，webpack4默认不需要配置文件，可以通过mode选项为webpack指定了一些默认的配置，mode分为：development/production，默认是production。
+
+loader 和 plugin 的主要区别：
+loader 用于加载某些资源文件。
+	因为 webpack 只能理解 JavaScript 和 JSON 文件，对于其他资源例如 css，图片，或者其他的语法集，比如 jsx， coffee，是没有办法加载的。 这就需要对应的loader将资源转化，加载进来。从字面意思也能看出，loader是用于加载的，它作用于一个个文件上。
+	plugin 用于扩展webpack的功能。
+	目的在于解决loader无法实现的其他事,它直接作用于 webpack，扩展了它的功能。当然loader也是变相的扩展了 webpack ，但是它只专注于转化文件（transform）这一个领域。而plugin的功能更加的丰富，而不仅局限于资源的加载。
